@@ -6,6 +6,7 @@ import unittest
 
 import tests.backport_assert_raises  # noqa
 from nose.tools import assert_raises
+from nose.plugins.attrib import attr
 
 from moto import mock_ec2_deprecated, mock_s3_deprecated
 
@@ -25,6 +26,7 @@ def test_basic_decorator():
     list(conn.get_all_instances()).should.equal([])
 
 
+@attr('boto2_test')
 def test_context_manager():
     conn = boto.connect_ec2('the_key', 'the_secret')
     with assert_raises(EC2ResponseError):
@@ -39,6 +41,7 @@ def test_context_manager():
         conn.get_all_instances()
 
 
+@attr('boto2_test')
 def test_decorator_start_and_stop():
     conn = boto.connect_ec2('the_key', 'the_secret')
     with assert_raises(EC2ResponseError):
