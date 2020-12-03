@@ -428,6 +428,17 @@ class Job(threading.Thread, BaseModel, DockerModel):
             self.job_started_at = datetime.datetime.now()
             self.job_state = "STARTING"
             log_config = docker.types.LogConfig(type=docker.types.LogConfig.types.JSON)
+            # podman does not support short container image name out of box - try to make a full name
+            if ":" in image:
+                image_repository, image_tag = image.split(":", maxsplit=1)
+            else:
+                image_repository = image
+                image_tag = "latest"
+            if "/" not in image_repository:
+                image_repository = "library/" + image_repository
+            if len(image_repository.split("/")) != 3:
+                image_repository = "docker.io/" + image_repository
+            self.docker_client.images.pull(image_repository, image_tag)
             container = self.docker_client.containers.run(
                 image,
                 cmd,
